@@ -1,0 +1,391 @@
+---
+title: "Econometric Examples in R"
+author: "Patrick Wynne"
+layout: slide
+date: "April 16, 2016"
+output: 
+        revealjs::revealjs_presentation:
+                theme: solarized
+---
+
+##  What is R?
+
+- From wikipedia:
+
+- A free software programming language
+
+- A software environment for statistical computing and graphics
+
+- An implementation of the S programming language combined with lexical scoping semantics inspired by Scheme
+
+- A GNU project
+
+## Why use R?
+
+- Free and open source
+
+- Runs on all major operating systems, including Windows, Mac, Unix, and Linux, etc.
+
+- Huge and vibrant user community
+
+- Platform of choice for cutting-edge statistical methodology
+
+- Widely used tool for the new field of data science
+
+## Who uses R
+
+- Revolution Analytics (owned by Microsoft) has an informal [list](http://www.revolutionanalytics.com/companies-using-r) of companies that use R.
+
+- Bank of America:"[R is] also catching on on Wall Street. Traditionally, banking analysts would pore over Excel files late into the night, but now R is increasingly being used for financial modeling, particularly as a visualization tool, says Niall O’Connor, vice president at Bank of America. 'R makes our mundane tables stand out,' he says."
+
+## Who uses R Continued
+
+- Facebook
+
+- Ford Motor Company
+
+- Google
+
+- Microsoft
+
+- Renaissance Technologies, Google, and Microsoft are all sponsors of this years [UseR! conference](http://user2016.org/#sponsors) in San Francisco
+
+## Who uses R Continued
+
+- [R is the fastest growing language on Stack Overflow](http://blog.revolutionanalytics.com/2015/12/r-is-the-fastest-growing-language-on-stackoverflow.html), a popular Q&A site for programmers.
+
+
+## Spreadsheets vs Statistical Programming Languages
+
+- Cells in spreadsheets combine both data presentationand programming/computation logic
+
+- Spreadsheets allow in-place mutation of data
+
+- These features have strengths in reactivity - changes are visulized immediately
+
+- These features also make spreadsheets error prone
+
+## Famous spreadsheet errors
+
+- There are several famous spreadsheet blunders
+
+- Thomas Piketty's "Capital in the Twenty-First Century"
+
+- The London Whale
+
+- Goldman Sachs purchasing of S+ Language
+        
+## Piketty
+
+- The analysis for Thomas Piketty's best selling book "Capital in the Twenty-First Century" was done in excel spreadsheets
+
+- A [Financial Times](http://www.ft.com/intl/cms/s/2/e1f343ca-e281-11e3-89fd-00144feabdc0.html#axzz45uEZwnPL) investigation found various issues with Piketty's analysis
+
+- Neil Irwin of [New York Times The Upshot](http://www.nytimes.com/2014/05/24/upshot/did-piketty-get-his-math-wrong.html?rref=upshot&_r=1) outlines some of the mistakes
+
+- Simple data errors: Selecting the wrong cell ranges
+
+- Arbitrary or unexplained changes: random data manipulations
+
+## London Whale
+
+- "...what has been generally under-reported about the London Whale debacle is how badly Excel failed as a financial modeling program... the report states that the model suffered from some pretty standard Excel flaws"
+
+- "the model operated through a series of Excel spreadsheets, completed manually, by a process of copying and pasting data from one spreadsheet to another"
+
+- "After subtracting the old rate from the new rate, the spreadsheet divided by their sum instead of their average, as the modeler had intended. This error likely had the effect of muting volatility by a factor of two and of lowering the VaR..."
+
+## Goldman Sachs
+
+- Vista Equity Partners in 2014 agreed to acquire Tibco Software (ownders of S-PLUS, a commercial implementation of the S langauge which R is based on)
+
+- Goldman Sachs, missing counting the number of existing shares of Tibco, valued Tibco at $4.3 billion at $24 a share rather than the actual $4.2 billion
+
+- Vista Equity Partners were charged an additional $100 million while purchasing analytic software that could have prevented the mistake entirely
+
+- The correction was made Tibco shareholders made 61 cents less per share than initially announced
+
+## Download R
+
+- To download and install R and RStudio, we are going to loosely follow the Andrew Heiss' [guide](https://www.andrewheiss.com/blog/2012/04/17/install-r-rstudio-r-commander-windows-osx/)
+
+- First we have to download R for [Windows](http://cran.us.r-project.org/) or [Mac](http://cran.us.r-project.org/)
+
+- Once downloaded, Install R and leave all default settings in the installation options.
+
+## Download R Studio
+
+- R Studio is an integrated development environment (IDE) for R
+
+- It provides graphical user interface to your R environment
+
+- [RStudio](https://www.rstudio.com/products/rstudio/download/)
+
+## Mac
+
+- Go to your Applications folder and find a folder named Utilities. Verify that you have a program named “X11” there. If not, go to http://xquartz.macosforge.org/ and download and install the latest version of XQuartz.
+
+
+## Loading packages and importing data
+
+```{r, message=FALSE, warning=FALSE, results='markup'}
+
+library(dplyr)
+library(tidyr)
+library(repmis)
+library(ggplot2)
+
+#import files from dropbox
+
+Data <- source_DropboxData(file = "FinanceExample.csv", 
+                              key = "x61awpr4vqvi97y", header = TRUE)
+
+```
+
+
+## Summary Statistics
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+library(stargazer)
+
+stargazer(Data, type = "html")
+
+
+```
+
+
+## Summary Statistics
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+library(stargazer)
+
+stargazer(Data, type = "html")
+
+
+```
+
+## Correlation Matrix
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+
+CorrelationMatrix <- cor(Data[2:5])
+
+stargazer(CorrelationMatrix, type = "text")
+
+
+```
+
+
+## Correlation Matrix
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+CorrelationMatrix <- cor(Data[2:5])
+
+stargazer(CorrelationMatrix, type = "html")
+
+
+```
+
+## Simple Linear Regression JP Morgan
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+
+JPM_SimpleRegression <- lm(`JPM-rf` ~ `S&P-rf`, data = Data)
+
+stargazer(JPM_SimpleRegression, type = "text", title = "JPM Versus S&P-rf",
+          single.row = TRUE)
+
+
+```
+
+
+## 
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+
+stargazer(JPM_SimpleRegression, type = "html", title = "JPM Versus S&P-rf",
+          single.row = TRUE)
+
+
+```
+
+
+## Multiple Regression JPM
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+
+JPM_MultipleRegression <- lm(`JPM-rf`  ~ mktrf + smb + hml, data = Data)
+
+stargazer(JPM_MultipleRegression, type = "text", title = "Multiple Regression on JPM",
+          single.row = TRUE)
+
+
+```
+
+
+## 
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+
+stargazer(JPM_MultipleRegression, type = "html", title = "Multiple Regression on JPM",
+          single.row = TRUE)
+
+
+```
+
+## Quantitative Visualisation - Importing Data
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+
+TidyData <- source_DropboxData(file = "TidyData.csv", 
+                              key = "696eznkt27987v5", header = TRUE)
+
+TidyData$date <- as.Date(TidyData$date, "%Y-%m-%d")
+
+head(TidyData)
+
+```
+
+
+## 
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+
+stargazer(head(TidyData), summary = FALSE, type = 'html')
+
+
+```
+
+
+## SCatter plot 
+
+```{r, message=FALSE, warning=FALSE, results='hide', fig.show='hide'}
+
+library(ggplot2)
+
+plot <- ggplot(data=TidyData, aes(x=date, y=Performance))
+
+plot + geom_point()
+
+```
+
+
+## 
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+
+plot <- ggplot(data=TidyData, aes(x=date, y=Performance))
+
+plot + geom_point()
+
+
+```
+
+
+## Scatter Plot Discussed
+
+- We see all the points represented, but we don't know which index/stock the respective points belong to
+
+
+
+## Scatter Plot Color 
+
+```{r, message=FALSE, warning=FALSE, results='hide', fig.show='hide'}
+
+plot <- ggplot(data=TidyData, aes(x=date, y=Performance))
+
+plot + geom_point(aes(color = Index))
+
+```
+
+
+## 
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+
+plot <- ggplot(data=TidyData, aes(x=date, y=Performance))
+
+plot + geom_point(aes(color = Index))
+
+
+```
+
+
+## Scatter Plot Colors Discussed
+
+- Now we have a legend and coloring system for each point, but it's still difficult to distinguish trends.
+
+- Lets try a line graph instead.
+
+## Line Graph
+
+```{r, message=FALSE, warning=FALSE, results='hide', fig.show='hide'}
+
+plot <- ggplot(data=TidyData, aes(x=date, y=Performance))
+
+plot + geom_line(aes(color = Index))
+
+```
+
+
+## 
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+
+plot <- ggplot(data=TidyData, aes(x=date, y=Performance))
+
+plot + geom_line(aes(color = Index))
+
+
+```
+
+
+## Line Graph Colors Discussed
+
+- It's still difficult to determine trends.
+
+- Lets try facetting the graph by index/stock
+
+## Facetted Line Graph
+
+```{r, message=FALSE, warning=FALSE, results='hide', fig.show='hide'}
+
+plot <- ggplot(data=TidyData, aes(x=date, y=Performance))
+
+plot + geom_line(aes(color = Index)) + facet_wrap(~ Index)
+
+```
+
+
+## 
+
+```{r, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+
+plot <- ggplot(data=TidyData, aes(x=date, y=Performance))
+
+plot + geom_line(aes(color = Index)) + facet_wrap(~ Index)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
